@@ -1,0 +1,25 @@
+{
+  "name": "cg-pet-calc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha --reporter spec --bail --check-leaks test/ "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tony1223/cg-pet-calc.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tony1223/cg-pet-calc/issues"
+  },
+  "homepage": "https://github.com/tony1223/cg-pet-calc#readme",
+  "dependencies": {
+    "mathjs": "^11.11.2",
+    "mocha": "^10.2.0",
+    "string-width": "^6.1.0"
+  }
+}
