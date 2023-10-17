@@ -26,4 +26,27 @@ describe('app.all()', function () {
         done();
 
     });
+    it("聖誕水藍鼠 98 2308 1327 935 328 281", (done) => {
+        var testcase = "聖誕水藍鼠 98 2308 1327 935 328 281";
+        var token = testcase.split(/ +/);
+        const results = RealGuess(PetDefaultData, token[0], ...token.slice(1).map(n=>parseInt(n,10))        );
+        const limit = 10;
+        const showDetails = 100;
+
+        console.log(GuessResultToString(results, limit, showDetails));
+        done();
+
+    });
+
+    it("紅色口臭鬼 1 122 102 36 33 28", (done) => {
+        var testcase = "紅色口臭鬼 1 122 102 36 33 28";
+        var token = testcase.split(/ +/);
+        const results = RealGuess(PetDefaultData, token[0], ...token.slice(1).map(n=>parseInt(n,10))        );
+        const limit = 10;
+        const showDetails = 100;
+
+        console.log(GuessResultToString(results, limit, showDetails));
+        done();
+
+    });
 });
