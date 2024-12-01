@@ -7,5 +7,6 @@
 
 import {RealGuess,GuessResultToString} from "./lib/PetCalc.mjs"
 import {PetDefaultData} from "./lib/PetData.mjs"
+import {calcDiff, minmax, RealGuessRaw} from "./lib/Pets.mjs"
 
-export {RealGuess,GuessResultToString,PetDefaultData};
+export {RealGuess,GuessResultToString,PetDefaultData,calcDiff, minmax, RealGuessRaw};
