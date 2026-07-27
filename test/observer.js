@@ -124,6 +124,67 @@ describe('observer match mode', function () {
         });
     });
 
+    // ── auto ─────────────────────────────────────────────────────────────────
+    //
+    // observer 單開是「一律套容差」，跟 Rust 版的 MatchMode::Observer 一樣照搬
+    // 原程式的階梯：第一階有解就回傳。這有個後果 —— 第一階靠容差湊出解時，
+    // 第二階本來要給的精確解就再也拿不到了（紫翎 9 級：exact 退到第二階拿 31 組，
+    // observer 在第一階湊出 5 組就收工，兩邊完全不相交）。
+    //
+    // auto 就是為了這個存在的：精確的兩階先跑完，全空了才升級到容差。
+    describe('auto', () => {
+        // [名稱, 參數, exact 有沒有解]
+        const LADDER_CASES = [
+            ['紫翎', [9, 225, 311, 42, 56, 71, 0], true],           // exact 靠第二階才有解
+            ['純白液態史萊姆', [59, 1815, 701, 280, 189, 140, 13], false], // exact 整數列舉全空
+            ['聖誕水藍鼠', [98, 2308, 1327, 935, 328, 281, 0], true],
+            ['紅帽哥布林', [1, 97, 68, 42, 39, 31, 0], true],        // 等級 1
+        ];
+
+        for (const [name, params, exactHasSolution] of LADDER_CASES) {
+            it(`${name} ${params[0]} 級：auto 不會弄丟 exact 的解`, () => {
+                const exact = guess(name, params, {mode: 'exact'});
+                const auto = guess(name, params, {mode: 'auto'});
+
+                const exactInt = exact.filter(r => !r.isApproximate);
+                assert.strictEqual(exactInt.length > 0, exactHasSolution,
+                    'exact 有沒有解跟這個案例的前提對不上，案例要重挑');
+
+                const seen = new Set(auto.map(key));
+                assert.deepStrictEqual(
+                    exactInt.filter(r => !seen.has(key(r))).map(key), [],
+                    'auto 弄丟了 exact 的解');
+            });
+        }
+
+        it('exact 有解時，auto 一步都不放寬', () => {
+            // 這條決定了 blast radius：exact 算得出來的案例，auto 的輸出完全不變。
+            const [name, params] = [LADDER_CASES[0][0], LADDER_CASES[0][1]];
+            assert.deepStrictEqual(
+                guess(name, params, {mode: 'auto'}).map(key).sort(),
+                guess(name, params, {mode: 'exact'}).map(key).sort());
+        });
+
+        it('exact 無解時，auto 退到跟 observer 一樣', () => {
+            const [name, params] = CASES[0];  // 純白液態史萊姆 59 級
+            assert.deepStrictEqual(
+                guess(name, params, {mode: 'auto'}).map(key).sort(),
+                guess(name, params, {mode: 'observer'}).map(key).sort());
+        });
+
+        it('紫翎 9 級就是 observer 單開會踩到的那顆地雷', () => {
+            // 反過來釘住：observer 確實會弄丟解。這不是 bug，是照搬原程式的階梯，
+            // 但也正因為如此，對外的預設不該是 observer。
+            const [name, params] = [LADDER_CASES[0][0], LADDER_CASES[0][1]];
+            const exactInt = guess(name, params, {mode: 'exact'}).filter(r => !r.isApproximate);
+            const observer = guess(name, params, {mode: 'observer'});
+
+            const seen = new Set(observer.map(key));
+            assert.ok(exactInt.some(r => !seen.has(key(r))),
+                'observer 居然沒弄丟解 —— 階梯行為變了，auto 的存在理由要重新確認');
+        });
+    });
+
     describe('預設值', () => {
         it('不指定 mode 時跟原本完全一樣', () => {
             const [name, params] = CASES[1];
